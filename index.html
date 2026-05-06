@@ -21,6 +21,9 @@
         .text-michigan-blue { color: #00274C; }
         .bg-michigan-maize { background-color: #FFCB05; }
         .text-michigan-maize { color: #FFCB05; }
+        
+        /* Hide scrollbar for clean look */
+        ::-webkit-scrollbar { width: 0px; background: transparent; }
     </style>
 </head>
 <body>
@@ -31,10 +34,12 @@
         </div>
     </div>
 
+    <!-- Frameworks -->
     <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 
+    <!-- Pure Firebase Module SDK -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
         import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js";
@@ -71,8 +76,20 @@
     <script type="text/babel">
         const { useState, useEffect, useMemo } = React;
 
-        const Car = () => <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path d="M9 17a2 2 0 11-4 0 2 2 0 014 0zM19 17a2 2 0 11-4 0 2 2 0 014 0z"/><path d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 01-1 1H9m4-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V16a1 1 0 01-1 1h-1m-6-1a1 1 0 001 1h1M5 17a2 2 0 104 0m-4 0a2 2 0 114 0m6 0a2 2 0 104 0m-4 0a2 2 0 114 0"/></svg>;
-        const Plus = () => <svg className="w-8 h-8" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><path d="M12 4v16m8-8H4"/></svg>;
+        // --- SVGs ---
+        const Car = ({className}) => <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2"/><circle cx="7" cy="17" r="2"/><path d="M9 17h6"/><circle cx="17" cy="17" r="2"/></svg>;
+        const Clock = ({className}) => <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>;
+        const Calendar = ({className}) => <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg>;
+        const Moon = ({className}) => <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>;
+        const Sun = ({className}) => <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>;
+        const CloudRain = ({className}) => <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242"/><path d="M16 14v6"/><path d="M8 14v6"/><path d="M12 16v6"/></svg>;
+        const Snowflake = ({className}) => <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><line x1="2" x2="22" y1="12" y2="12"/><line x1="12" x2="12" y1="2" y2="22"/><path d="m20 16-4-4 4-4"/><path d="m4 8 4 4-4 4"/><path d="m16 4-4 4-4-4"/><path d="m8 20 4-4 4 4"/></svg>;
+        const Cloud = ({className}) => <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/></svg>;
+        const List = ({className}) => <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><line x1="8" x2="21" y1="6" y2="6"/><line x1="8" x2="21" y1="12" y2="12"/><line x1="8" x2="21" y1="18" y2="18"/><line x1="3" x2="3.01" y1="6" y2="6"/><line x1="3" x2="3.01" y1="12" y2="12"/><line x1="3" x2="3.01" y1="18" y2="18"/></svg>;
+        const PlusCircle = ({className}) => <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><circle cx="12" cy="12" r="10"/><path d="M8 12h8"/><path d="M12 8v8"/></svg>;
+        const BarChart3 = ({className}) => <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></svg>;
+        const Trash2 = ({className}) => <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg>;
+        const Wind = ({className}) => <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M17.7 7.7a2.5 2.5 0 1 1 1.8 4.3H2"/><path d="M9.6 4.6A2 2 0 1 1 11 8H2"/><path d="M12.6 19.4A2 2 0 1 0 14 16H2"/></svg>;
 
         function App() {
             const [drives, setDrives] = useState([]);
@@ -81,12 +98,23 @@
             const [error, setError] = useState("");
             const [isSaving, setIsSaving] = useState(false);
             
+            // Form Data
             const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
             const [timeOfDay, setTimeOfDay] = useState('Day');
             const [duration, setDuration] = useState('');
             const [miles, setMiles] = useState('');
+            const [weather, setWeather] = useState('Clear');
+            const [traffic, setTraffic] = useState('Light');
             const [notes, setNotes] = useState('');
 
+            // Helper format time
+            const formatTime = (totalMinutes) => {
+                const hours = Math.floor(totalMinutes / 60);
+                const minutes = totalMinutes % 60;
+                return `${hours}h ${minutes}m`;
+            };
+
+            // Auth Effect
             useEffect(() => {
                 const interval = setInterval(async () => {
                     if (window.fb) {
@@ -102,13 +130,14 @@
                             setUser(res.user);
                             setError("");
                         } catch (e) {
-                            setError(`Authentication Error: Make sure 'Anonymous' sign-in is enabled in Firebase Console. (${e.message})`);
+                            setError(`Auth Error: Make sure 'Anonymous' sign-in is enabled. (${e.message})`);
                         }
                     }
                 }, 100);
                 return () => clearInterval(interval);
             }, []);
 
+            // Data Fetch Effect
             useEffect(() => {
                 if (!user || !window.fb) return;
                 const { db, methods, appId, isGemini } = window.fb;
@@ -118,15 +147,16 @@
 
                 const unsub = methods.onSnapshot(path, (snap) => {
                     setDrives(snap.docs.map(d => ({ id: d.id, ...d.data() })).sort((a,b) => b.timestamp - a.timestamp));
-                }, (err) => setError("Database Error: Make sure Firestore is created and rules are set to public (Test Mode)."));
+                }, (err) => setError("Database Error: Make sure Firestore rules are set to public (Test Mode)."));
                 return () => unsub();
             }, [user]);
 
-            const stats = useMemo(() => ({
-                totalMins: drives.reduce((acc, curr) => acc + Number(curr.duration || 0), 0),
-                totalMiles: drives.reduce((acc, curr) => acc + Number(curr.miles || 0), 0),
-                nightMins: drives.filter(d => d.timeOfDay === 'Night').reduce((acc, curr) => acc + Number(curr.duration || 0), 0)
-            }), [drives]);
+            const stats = useMemo(() => {
+                const totalMinutes = drives.reduce((acc, curr) => acc + Number(curr.duration || 0), 0);
+                const totalMiles = drives.reduce((acc, curr) => acc + Number(curr.miles || 0), 0);
+                const nightMinutes = drives.filter(d => d.timeOfDay === 'Night').reduce((acc, curr) => acc + Number(curr.duration || 0), 0);
+                return { totalMinutes, totalMiles, nightMinutes };
+            }, [drives]);
 
             const handleAdd = async (e) => {
                 e.preventDefault();
@@ -137,15 +167,20 @@
                     const path = isGemini 
                         ? methods.collection(db, 'artifacts', appId, 'public', 'data', 'drives')
                         : methods.collection(db, 'artifacts', appId, 'users', user.uid, 'drives');
-                    await methods.addDoc(path, { date, timeOfDay, duration: Number(duration), miles: Number(miles), notes, timestamp: Date.now() });
-                    setDuration(''); setMiles(''); setNotes('');
+                    
+                    await methods.addDoc(path, { 
+                        date, timeOfDay, duration: Number(duration), miles: Number(miles), weather, traffic, notes, timestamp: Date.now() 
+                    });
+                    
+                    // Reset fields
+                    setDuration(''); setMiles(''); setNotes(''); setWeather('Clear'); setTraffic('Light');
                     setActiveTab('history');
                 } catch (err) { setError(`Save failed.`); }
                 finally { setIsSaving(false); }
             };
 
             const handleDelete = async (id) => {
-                if (!confirm("Permanently delete entry?")) return;
+                if (!confirm("Permanently delete this drive?")) return;
                 const { db, methods, appId, isGemini } = window.fb;
                 const docPath = isGemini 
                     ? methods.doc(db, 'artifacts', appId, 'public', 'data', 'drives', id)
@@ -153,12 +188,25 @@
                 await methods.deleteDoc(docPath);
             };
 
+            const renderWeatherIcon = (w) => {
+                switch(w) {
+                    case 'Clear': return <Sun className="w-4 h-4 text-amber-500" />;
+                    case 'Cloudy': return <Cloud className="w-4 h-4 text-slate-500" />;
+                    case 'Rain': return <CloudRain className="w-4 h-4 text-blue-500" />;
+                    case 'Snow': return <Snowflake className="w-4 h-4 text-sky-400" />;
+                    case 'Fog': return <Wind className="w-4 h-4 text-slate-400" />;
+                    default: return <Sun className="w-4 h-4 text-amber-500" />;
+                }
+            };
+
             return (
-                <div className="flex justify-center min-h-screen bg-slate-100">
+                <div className="flex justify-center min-h-screen bg-slate-100 font-sans">
                     <div className="w-full max-w-md bg-white shadow-2xl min-h-screen flex flex-col relative border-x border-slate-200">
+                        
+                        {/* Header */}
                         <header className="bg-michigan-blue text-michigan-maize p-6 rounded-b-[2.5rem] shadow-xl z-10">
                             <div className="flex items-center gap-4">
-                                <div className="bg-white/10 p-2.5 rounded-2xl border border-white/15 shadow-inner"><Car /></div>
+                                <div className="bg-white/10 p-2.5 rounded-2xl border border-white/15 shadow-inner"><Car className="w-7 h-7" /></div>
                                 <div>
                                     <h1 className="text-2xl font-black uppercase tracking-tighter leading-none mb-1">Permit Tracker</h1>
                                     <p className="text-[10px] uppercase font-black opacity-70 tracking-[0.2em]">Michigan • Brayden Edition</p>
@@ -166,9 +214,9 @@
                             </div>
                         </header>
 
-                        <main className="flex-1 p-6 pb-40 overflow-y-auto">
+                        <main className="flex-1 p-6 pb-32 overflow-y-auto">
                             {error && (
-                                <div className="bg-red-50 text-red-600 p-6 rounded-3xl border-2 border-red-100 text-[11px] font-bold mb-6 animate-fade-in text-center leading-relaxed">
+                                <div className="bg-red-50 text-red-600 p-6 rounded-3xl border-2 border-red-100 text-[11px] font-bold mb-6 animate-fade-in text-center leading-relaxed shadow-sm">
                                     <p className="mb-3">⚠️ {error}</p>
                                 </div>
                             )}
@@ -180,12 +228,18 @@
                                 </div>
                             ) : (
                                 <div className="animate-fade-in">
+                                    {/* TAB: STATS */}
                                     {activeTab === 'stats' && (
                                         <div className="space-y-7">
+                                            <div className="flex items-center gap-2 text-michigan-blue">
+                                                <BarChart3 className="w-5 h-5" />
+                                                <h2 className="text-sm font-black uppercase tracking-widest">Dashboard</h2>
+                                            </div>
+
                                             <div className="grid grid-cols-2 gap-4">
                                                 <div className="bg-blue-50 p-5 rounded-[2.2rem] border border-blue-100 shadow-sm text-center">
                                                     <p className="text-[10px] text-blue-400 font-black uppercase mb-1">Total Time</p>
-                                                    <p className="text-2xl font-black text-michigan-blue leading-none tracking-tight">{Math.floor(stats.totalMins/60)}<span className="text-[10px] opacity-40 ml-0.5 font-bold uppercase leading-none">H</span> {stats.totalMins%60}<span className="text-[10px] opacity-40 ml-0.5 font-bold uppercase leading-none">M</span></p>
+                                                    <p className="text-2xl font-black text-michigan-blue leading-none tracking-tight">{Math.floor(stats.totalMinutes/60)}<span className="text-[10px] opacity-40 ml-0.5 font-bold uppercase leading-none">H</span> {stats.totalMinutes%60}<span className="text-[10px] opacity-40 ml-0.5 font-bold uppercase leading-none">M</span></p>
                                                 </div>
                                                 <div className="bg-amber-50 p-5 rounded-[2.2rem] border border-amber-100 shadow-sm text-center">
                                                     <p className="text-[10px] text-amber-500 font-black uppercase mb-1">Distance</p>
@@ -194,73 +248,144 @@
                                             </div>
 
                                             <div className="space-y-8 bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-2xl shadow-slate-200/50">
-                                                <h3 className="text-xs font-black text-slate-800 uppercase tracking-widest border-b border-slate-50 pb-4 text-center">State Requirements</h3>
+                                                <h3 className="text-[11px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-50 pb-4 text-center">State Requirements</h3>
                                                 <div className="space-y-4">
-                                                    <div className="flex justify-between text-[11px] font-black text-slate-500 uppercase px-1">
-                                                        <span>Total Hours (Goal: 50)</span>
-                                                        <span className="text-michigan-blue font-black">{Math.floor(stats.totalMins/60)} / 50</span>
+                                                    <div className="flex justify-between text-[11px] font-black text-slate-600 uppercase px-1">
+                                                        <span>Total Hours (Goal: 50h)</span>
+                                                        <span className="text-michigan-blue font-black">{Math.floor(stats.totalMinutes/60)} / 50</span>
                                                     </div>
-                                                    <div className="w-full bg-slate-100 h-5 rounded-full overflow-hidden p-1 shadow-inner">
-                                                        <div className="bg-michigan-blue h-full rounded-full transition-all duration-1000 shadow-lg" style={{width: `${Math.min((stats.totalMins/(50*60))*100, 100)}%`}}></div>
+                                                    <div className="w-full bg-slate-100 h-4 rounded-full overflow-hidden p-0.5 shadow-inner">
+                                                        <div className="bg-michigan-blue h-full rounded-full transition-all duration-1000 shadow-sm" style={{width: `${Math.min((stats.totalMinutes/(50*60))*100, 100)}%`}}></div>
                                                     </div>
                                                 </div>
                                                 <div className="space-y-4">
-                                                    <div className="flex justify-between text-[11px] font-black text-slate-500 uppercase px-1">
-                                                        <span>Night Hours (Goal: 10)</span>
-                                                        <span className="text-michigan-blue font-black">{Math.floor(stats.nightMins/60)} / 10</span>
+                                                    <div className="flex justify-between text-[11px] font-black text-slate-600 uppercase px-1">
+                                                        <span className="flex items-center gap-1.5"><Moon className="w-3.5 h-3.5" /> Night Hours (Goal: 10h)</span>
+                                                        <span className="text-michigan-blue font-black">{Math.floor(stats.nightMinutes/60)} / 10</span>
                                                     </div>
-                                                    <div className="w-full bg-slate-100 h-5 rounded-full overflow-hidden p-1 shadow-inner text-center">
-                                                        <div className="bg-michigan-maize h-full rounded-full transition-all duration-1000 shadow-lg" style={{width: `${Math.min((stats.nightMins/(10*60))*100, 100)}%`}}></div>
+                                                    <div className="w-full bg-slate-100 h-4 rounded-full overflow-hidden p-0.5 shadow-inner text-center">
+                                                        <div className="bg-michigan-maize h-full rounded-full transition-all duration-1000 shadow-sm" style={{width: `${Math.min((stats.nightMinutes/(10*60))*100, 100)}%`}}></div>
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
                                     )}
 
+                                    {/* TAB: ADD LOG */}
                                     {activeTab === 'add' && (
                                         <form onSubmit={handleAdd} className="space-y-6 pt-2">
-                                            <h2 className="text-xl font-black text-michigan-blue uppercase tracking-tight text-center leading-none">Log A Session</h2>
+                                            <div className="flex items-center justify-center gap-2 text-michigan-blue mb-2">
+                                                <PlusCircle className="w-6 h-6" />
+                                                <h2 className="text-xl font-black uppercase tracking-tight leading-none">Log Session</h2>
+                                            </div>
+                                            
                                             <div className="grid grid-cols-2 gap-4">
-                                                <input type="date" value={date} onChange={e => setDate(e.target.value)} className="w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-2xl font-black text-slate-700 outline-none focus:border-michigan-blue transition-all shadow-sm" />
-                                                <div className="flex bg-slate-50 p-1 rounded-2xl border-2 border-slate-100 shadow-sm">
-                                                    <button type="button" onClick={() => setTimeOfDay('Day')} className={`flex-1 py-3 text-[10px] font-black uppercase rounded-xl transition-all ${timeOfDay === 'Day' ? 'bg-white text-michigan-blue shadow-md' : 'text-slate-400'}`}>Day</button>
-                                                    <button type="button" onClick={() => setTimeOfDay('Night')} className={`flex-1 py-3 text-[10px] font-black uppercase rounded-xl transition-all ${timeOfDay === 'Night' ? 'bg-michigan-blue text-michigan-maize shadow-md' : 'text-slate-400'}`}>Night</button>
+                                                <div className="space-y-1.5">
+                                                    <label className="text-[10px] font-black text-slate-400 uppercase ml-2">Date</label>
+                                                    <input type="date" value={date} onChange={e => setDate(e.target.value)} className="w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-2xl font-black text-slate-700 outline-none focus:border-michigan-blue transition-all shadow-sm" required />
+                                                </div>
+                                                <div className="space-y-1.5">
+                                                    <label className="text-[10px] font-black text-slate-400 uppercase ml-2">Setting</label>
+                                                    <div className="flex bg-slate-50 p-1 rounded-2xl border-2 border-slate-100 shadow-sm">
+                                                        <button type="button" onClick={() => setTimeOfDay('Day')} className={`flex-1 py-3 text-[10px] flex items-center justify-center gap-1 font-black uppercase rounded-xl transition-all ${timeOfDay === 'Day' ? 'bg-white text-michigan-blue shadow-md' : 'text-slate-400'}`}><Sun className="w-3 h-3"/> Day</button>
+                                                        <button type="button" onClick={() => setTimeOfDay('Night')} className={`flex-1 py-3 text-[10px] flex items-center justify-center gap-1 font-black uppercase rounded-xl transition-all ${timeOfDay === 'Night' ? 'bg-michigan-blue text-michigan-maize shadow-md' : 'text-slate-400'}`}><Moon className="w-3 h-3"/> Night</button>
+                                                    </div>
                                                 </div>
                                             </div>
+                                            
                                             <div className="grid grid-cols-2 gap-4">
-                                                <input type="number" placeholder="Min" value={duration} onChange={e => setDuration(e.target.value)} className="w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-2xl font-black text-slate-700 outline-none focus:border-michigan-blue shadow-sm" required />
-                                                <input type="number" step="0.1" placeholder="Miles" value={miles} onChange={e => setMiles(e.target.value)} className="w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-2xl font-black text-slate-700 outline-none focus:border-michigan-blue shadow-sm" required />
+                                                <div className="space-y-1.5">
+                                                    <label className="text-[10px] font-black text-slate-400 uppercase ml-2">Duration (Min)</label>
+                                                    <input type="number" min="1" placeholder="45" value={duration} onChange={e => setDuration(e.target.value)} className="w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-2xl font-black text-slate-700 outline-none focus:border-michigan-blue shadow-sm" required />
+                                                </div>
+                                                <div className="space-y-1.5">
+                                                    <label className="text-[10px] font-black text-slate-400 uppercase ml-2">Distance (Mi)</label>
+                                                    <input type="number" step="0.1" min="0.1" placeholder="15.5" value={miles} onChange={e => setMiles(e.target.value)} className="w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-2xl font-black text-slate-700 outline-none focus:border-michigan-blue shadow-sm" required />
+                                                </div>
                                             </div>
-                                            <textarea placeholder=" practiced parking, merging, traffic..." value={notes} onChange={e => setNotes(e.target.value)} className="w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-2xl h-24 resize-none font-medium text-slate-600 outline-none focus:border-michigan-blue shadow-inner"></textarea>
-                                            <button type="submit" disabled={isSaving || !user} className="w-full bg-michigan-blue text-michigan-maize font-black py-6 rounded-[2.5rem] shadow-2xl active:scale-95 transition-all text-sm uppercase tracking-widest mt-4 shadow-blue-900/40">
-                                                {isSaving ? "Saving..." : "Add to Log"}
+
+                                            <div className="grid grid-cols-2 gap-4">
+                                                <div className="space-y-1.5">
+                                                    <label className="text-[10px] font-black text-slate-400 uppercase ml-2">Weather</label>
+                                                    <select value={weather} onChange={e => setWeather(e.target.value)} className="w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-2xl font-black text-slate-700 outline-none focus:border-michigan-blue shadow-sm appearance-none">
+                                                        <option value="Clear">Clear</option>
+                                                        <option value="Cloudy">Cloudy</option>
+                                                        <option value="Rain">Rain</option>
+                                                        <option value="Snow">Snow</option>
+                                                        <option value="Fog">Fog</option>
+                                                    </select>
+                                                </div>
+                                                <div className="space-y-1.5">
+                                                    <label className="text-[10px] font-black text-slate-400 uppercase ml-2">Traffic</label>
+                                                    <select value={traffic} onChange={e => setTraffic(e.target.value)} className="w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-2xl font-black text-slate-700 outline-none focus:border-michigan-blue shadow-sm appearance-none">
+                                                        <option value="Light">Light</option>
+                                                        <option value="Moderate">Moderate</option>
+                                                        <option value="Heavy">Heavy</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+
+                                            <div className="space-y-1.5">
+                                                <label className="text-[10px] font-black text-slate-400 uppercase ml-2">Notes</label>
+                                                <textarea placeholder=" highway merges, tricky parking, heavy traffic..." value={notes} onChange={e => setNotes(e.target.value)} className="w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-2xl h-24 resize-none font-medium text-slate-600 outline-none focus:border-michigan-blue shadow-inner"></textarea>
+                                            </div>
+                                            <button type="submit" disabled={isSaving || !user} className="w-full bg-michigan-blue text-michigan-maize font-black py-5 rounded-2xl shadow-xl active:scale-95 transition-all text-sm uppercase tracking-widest mt-2 flex items-center justify-center gap-2">
+                                                {isSaving ? "Saving..." : <><PlusCircle className="w-5 h-5"/> Save Drive</>}
                                             </button>
                                         </form>
                                     )}
 
+                                    {/* TAB: HISTORY */}
                                     {activeTab === 'history' && (
                                         <div className="space-y-5">
-                                            <h2 className="text-[11px] font-black text-slate-400 uppercase tracking-widest text-center">Drive History</h2>
+                                            <div className="flex items-center gap-2 text-michigan-blue mb-2">
+                                                <List className="w-5 h-5" />
+                                                <h2 className="text-sm font-black uppercase tracking-widest">Drive History</h2>
+                                            </div>
+                                            
                                             {drives.length === 0 ? (
-                                                <div className="text-center py-24 bg-slate-50 rounded-[3rem] border-2 border-dashed border-slate-200 px-10 opacity-50 text-center">
-                                                    <p className="text-slate-400 font-black text-[10px] uppercase tracking-widest leading-relaxed">No drives logged yet.</p>
+                                                <div className="text-center py-20 bg-slate-50 rounded-[2.5rem] border-2 border-dashed border-slate-200 px-10 opacity-60">
+                                                    <Car className="w-10 h-10 text-slate-300 mx-auto mb-3" />
+                                                    <p className="text-slate-500 font-black text-[10px] uppercase tracking-widest leading-relaxed">No sessions logged yet. Tap + to start!</p>
                                                 </div>
                                             ) : (
                                                 drives.map(drive => (
-                                                    <div key={drive.id} className="p-7 bg-white border border-slate-100 rounded-[2.2rem] shadow-sm relative active:bg-slate-50 transition-colors">
-                                                        <button onClick={() => handleDelete(drive.id)} className="absolute top-7 right-7 text-slate-300 font-black text-xl hover:text-red-400 transition-colors">×</button>
-                                                        <p className="text-[10px] font-black text-slate-400 mb-2.5 uppercase leading-none tracking-tighter">{new Date(drive.date + 'T12:00:00').toLocaleDateString('en-US', {month: 'short', day: 'numeric', year: 'numeric'})} • {drive.timeOfDay}</p>
-                                                        <div className="flex gap-10">
-                                                            <div className="flex flex-col text-center">
-                                                                <span className="text-[9px] font-black text-slate-300 uppercase mb-1">Time</span>
-                                                                <span className="text-2xl font-black text-michigan-blue leading-none tracking-tight">{drive.duration}<span className="text-[11px] opacity-40 ml-0.5 font-bold uppercase leading-none">M</span></span>
+                                                    <div key={drive.id} className="p-6 bg-white border border-slate-100 rounded-[2rem] shadow-sm relative group">
+                                                        <button onClick={() => handleDelete(drive.id)} className="absolute top-5 right-5 text-slate-200 hover:text-red-400 transition-colors p-2">
+                                                            <Trash2 className="w-4 h-4" />
+                                                        </button>
+                                                        
+                                                        <div className="flex items-center gap-2 text-[10px] font-black text-slate-400 mb-3 uppercase tracking-wider">
+                                                            <Calendar className="w-3.5 h-3.5" />
+                                                            <span>{new Date(drive.date + 'T12:00:00').toLocaleDateString('en-US', {month: 'short', day: 'numeric', year: 'numeric'})}</span>
+                                                            <span className="opacity-40">•</span>
+                                                            <span className="flex items-center gap-1">
+                                                                {drive.timeOfDay === 'Day' ? <Sun className="w-3 h-3 text-amber-500"/> : <Moon className="w-3 h-3 text-michigan-blue"/>}
+                                                                {drive.timeOfDay}
+                                                            </span>
+                                                        </div>
+
+                                                        <div className="flex gap-4 mb-4 border-b border-slate-50 pb-4">
+                                                            <div className="flex-1">
+                                                                <span className="text-[9px] font-black text-slate-300 uppercase mb-0.5 block">Time</span>
+                                                                <span className="text-xl font-black text-michigan-blue leading-none tracking-tight">{formatTime(drive.duration)}</span>
                                                             </div>
-                                                            <div className="flex flex-col text-center border-l border-slate-50 pl-10">
-                                                                <span className="text-[9px] font-black text-slate-300 uppercase mb-1">Dist</span>
-                                                                <span className="text-2xl font-black text-slate-800 leading-none tracking-tight">{drive.miles}<span className="text-[11px] opacity-40 ml-0.5 font-bold uppercase leading-none">MI</span></span>
+                                                            <div className="flex-1 border-l border-slate-100 pl-4">
+                                                                <span className="text-[9px] font-black text-slate-300 uppercase mb-0.5 block">Dist</span>
+                                                                <span className="text-xl font-black text-slate-800 leading-none tracking-tight">{drive.miles}<span className="text-[10px] opacity-40 ml-1 font-bold uppercase">MI</span></span>
                                                             </div>
                                                         </div>
-                                                        {drive.notes && <p className="text-[11px] text-slate-500 font-medium mt-5 border-t border-slate-50 pt-4 italic leading-relaxed text-center">"{drive.notes}"</p>}
+
+                                                        <div className="flex flex-wrap gap-2 mb-2">
+                                                            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-wider bg-slate-50 text-slate-500 border border-slate-100">
+                                                                {renderWeatherIcon(drive.weather)} {drive.weather}
+                                                            </span>
+                                                            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-wider bg-slate-50 text-slate-500 border border-slate-100">
+                                                                <Car className="w-3.5 h-3.5 text-slate-400" /> Traffic: {drive.traffic}
+                                                            </span>
+                                                        </div>
+
+                                                        {drive.notes && <p className="text-[11px] text-slate-600 font-medium mt-3 bg-slate-50 p-3 rounded-xl border border-slate-100 italic leading-relaxed">"{drive.notes}"</p>}
                                                     </div>
                                                 ))
                                             )}
@@ -270,16 +395,21 @@
                             )}
                         </main>
 
-                        <footer className="fixed bottom-8 left-0 right-0 flex justify-center z-50 pointer-events-none px-6">
-                           <div className="w-full max-w-sm bg-michigan-blue/95 backdrop-blur-2xl border border-white/10 rounded-[3rem] p-5 flex justify-between items-center shadow-[0_30px_70px_-15px_rgba(0,0,0,0.5)] pointer-events-auto border-t border-white/5">
-                                <button onClick={() => setActiveTab('stats')} className={`flex-1 flex flex-col items-center gap-1.5 transition-all ${activeTab === 'stats' ? 'text-michigan-maize scale-110' : 'text-white/30 hover:text-white/60'}`}>
-                                    <span className="text-[9px] font-black uppercase tracking-tighter text-center leading-none">Stats</span>
+                        {/* Floating Bottom Nav */}
+                        <footer className="fixed bottom-6 left-0 right-0 flex justify-center z-50 pointer-events-none px-6">
+                           <div className="w-full max-w-sm bg-white border border-slate-100 rounded-[2.5rem] px-8 py-4 flex justify-between items-center shadow-[0_20px_40px_-10px_rgba(0,39,76,0.15)] pointer-events-auto">
+                                <button onClick={() => setActiveTab('stats')} className={`flex flex-col items-center gap-1.5 transition-all ${activeTab === 'stats' ? 'text-michigan-blue scale-110' : 'text-slate-300 hover:text-slate-500'}`}>
+                                    <BarChart3 className="w-6 h-6" />
+                                    <span className="text-[8px] font-black uppercase tracking-widest text-center leading-none">Stats</span>
                                 </button>
-                                <button onClick={() => setActiveTab('add')} className={`w-16 h-16 rounded-[1.8rem] flex items-center justify-center transition-all active:scale-90 ${activeTab === 'add' ? 'bg-michigan-maize text-michigan-blue rotate-45 scale-110 shadow-[0_0_25px_rgba(255,203,5,0.4)]' : 'bg-white/10 text-white'}`}>
-                                    <Plus />
+                                
+                                <button onClick={() => setActiveTab('add')} className={`relative -top-8 flex items-center justify-center w-[4.5rem] h-[4.5rem] rounded-full shadow-lg transition-transform hover:scale-105 active:scale-95 border-4 border-slate-100 ${activeTab === 'add' ? 'bg-michigan-blue shadow-michigan-blue/30 text-michigan-maize' : 'bg-michigan-maize shadow-michigan-maize/40 text-michigan-blue'}`}>
+                                    <Plus className="w-8 h-8 stroke-[3]" />
                                 </button>
-                                <button onClick={() => setActiveTab('history')} className={`flex-1 flex flex-col items-center gap-1.5 transition-all ${activeTab === 'history' ? 'text-michigan-maize scale-110' : 'text-white/30 hover:text-white/60'}`}>
-                                    <span className="text-[9px] font-black uppercase tracking-tighter text-center leading-none">Log</span>
+                                
+                                <button onClick={() => setActiveTab('history')} className={`flex flex-col items-center gap-1.5 transition-all ${activeTab === 'history' ? 'text-michigan-blue scale-110' : 'text-slate-300 hover:text-slate-500'}`}>
+                                    <List className="w-6 h-6" />
+                                    <span className="text-[8px] font-black uppercase tracking-widest text-center leading-none">Log</span>
                                 </button>
                            </div>
                         </footer>
