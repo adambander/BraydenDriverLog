@@ -7,16 +7,6 @@
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     
-    <!-- Ultra-Stable Firebase v8.10.1 (Legacy Standard) -->
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
-
-    <!-- React and Babel -->
-    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap');
         body { 
@@ -24,6 +14,7 @@
             -webkit-tap-highlight-color: transparent; 
             background-color: #f8fafc; 
             margin: 0;
+            user-select: none;
             overflow-x: hidden;
         }
         .animate-fade-in { animation: fadeIn 0.4s ease-out forwards; }
@@ -32,49 +23,62 @@
         .text-michigan-blue { color: #00274C; }
         .bg-michigan-maize { background-color: #FFCB05; }
         .text-michigan-maize { color: #FFCB05; }
-        /* Prevent accidental key case-changing in UI */
-        .key-text { text-transform: none !important; }
+        .key-input { font-family: monospace; text-transform: none !important; }
     </style>
 </head>
 <body>
     <div id="root">
         <div class="flex flex-col items-center justify-center min-h-screen opacity-30">
             <div class="w-10 h-10 border-4 border-slate-900 border-t-transparent rounded-full animate-spin mb-4"></div>
-            <p class="text-xs font-black uppercase tracking-widest text-center px-10">Starting Brayden's Tracker...</p>
+            <p class="text-xs font-black uppercase tracking-widest text-center px-10 leading-relaxed">Starting Brayden's Tracker...</p>
         </div>
     </div>
 
-    <script type="text/babel">
-        const { useState, useEffect, useMemo } = React;
+    <!-- React Framework -->
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 
-        // BRAYDEN'S VERIFIED FIREBASE CONFIGURATION
+    <!-- Modern Firebase Module SDK -->
+    <script type="module">
+        import { initializeApp, deleteApp, getApps } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js";
+        import { getFirestore, collection, onSnapshot, addDoc, doc, deleteDoc } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js";
+
         const braydenConfig = {
             apiKey: "AIzaSyDAcT3sFRZv3gUFcgE0E9aJ8nvXL6jGUGw",
             authDomain: "brayden-s-permit-tracker.firebaseapp.com",
             projectId: "brayden-s-permit-tracker",
             storageBucket: "brayden-s-permit-tracker.firebasestorage.app",
             messagingSenderId: "586260387117",
-            appId: "1:586260387117:web:8bebcc558fca66cf5c6fa4",
-            measurementId: "G-SJZTB6XX91"
+            appId: "1:586260387117:web:8bebcc558fca66cf5c6fa4"
         };
 
-        // Determine environment
-        const isPreview = typeof window.__firebase_config !== 'undefined' && window.__firebase_config !== null;
-        const finalConfig = isPreview ? JSON.parse(window.__firebase_config) : braydenConfig;
-        const activeAppId = isPreview && window.__app_id ? window.__app_id : "brayden-s-permit-tracker";
+        const isPreview = typeof __firebase_config !== 'undefined';
+        const finalConfig = isPreview ? JSON.parse(__firebase_config) : braydenConfig;
+        const activeAppId = isPreview && typeof __app_id !== 'undefined' ? __app_id : "brayden-s-permit-tracker";
 
-        // Initialize Firebase v8
-        if (!firebase.apps.length) {
-            firebase.initializeApp(finalConfig);
-        } else if (!isPreview) {
-            // Force re-init if standalone to clear bad states
-            firebase.app().delete().then(() => firebase.initializeApp(finalConfig));
-        }
+        const initFirebase = async (config = finalConfig) => {
+            const apps = getApps();
+            if (apps.length > 0) await Promise.all(apps.map(a => deleteApp(a)));
+            const app = initializeApp(config);
+            window.fb = {
+                auth: getAuth(app),
+                db: getFirestore(app),
+                collection, onSnapshot, addDoc, doc, deleteDoc, signInAnonymously, signInWithCustomToken,
+                appId: isPreview ? __app_id : "brayden-s-permit-tracker",
+                isPreview,
+                activeKey: config.apiKey
+            };
+        };
 
-        const auth = firebase.auth();
-        const db = firebase.firestore();
+        window.manualInit = initFirebase;
+        initFirebase();
+    </script>
 
-        // Icons
+    <script type="text/babel">
+        const { useState, useEffect, useMemo } = React;
+
         const Car = () => <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path d="M9 17a2 2 0 11-4 0 2 2 0 014 0zM19 17a2 2 0 11-4 0 2 2 0 014 0z"/><path d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 01-1 1H9m4-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V16a1 1 0 01-1 1h-1m-6-1a1 1 0 001 1h1M5 17a2 2 0 104 0m-4 0a2 2 0 114 0m6 0a2 2 0 104 0m-4 0a2 2 0 114 0"/></svg>;
         const Plus = () => <svg className="w-8 h-8" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><path d="M12 4v16m8-8H4"/></svg>;
 
@@ -84,6 +88,8 @@
             const [activeTab, setActiveTab] = useState('stats');
             const [error, setError] = useState("");
             const [isSaving, setIsSaving] = useState(false);
+            const [showEmergency, setShowEmergency] = useState(false);
+            const [manualKey, setManualKey] = useState("");
             
             const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
             const [timeOfDay, setTimeOfDay] = useState('Day');
@@ -91,88 +97,81 @@
             const [miles, setMiles] = useState('');
             const [notes, setNotes] = useState('');
 
-            // Troubleshooting
-            const forceReset = () => {
-                indexedDB.deleteDatabase("firebase-installations-database");
-                localStorage.clear();
-                window.location.reload(true);
+            const performAuth = async () => {
+                const interval = setInterval(async () => {
+                    if (window.fb) {
+                        clearInterval(interval);
+                        try {
+                            let result;
+                            if (window.fb.isPreview && typeof __initial_auth_token !== 'undefined') {
+                                result = await window.fb.signInWithCustomToken(window.fb.auth, __initial_auth_token);
+                            } else {
+                                result = await window.fb.signInAnonymously(window.fb.auth);
+                            }
+                            setUser(result.user);
+                            setError("");
+                        } catch (e) {
+                            setError(`Google rejected the key. This often happens for new apps. Refresh in 1 minute.`);
+                        }
+                    }
+                }, 100);
             };
 
-            // Authentication Effect
-            useEffect(() => {
-                const initAuth = async () => {
-                    try {
-                        let result;
-                        if (isPreview && window.__initial_auth_token) {
-                            result = await auth.signInWithCustomToken(window.__initial_auth_token);
-                        } else {
-                            result = await auth.signInAnonymously();
-                        }
-                        setUser(result.user);
-                    } catch (e) {
-                        console.error("Auth Failure:", e);
-                        setError(`Google Rejected Key: ${e.message}`);
-                    }
-                };
-                initAuth();
-            }, []);
+            useEffect(() => { performAuth(); }, []);
 
-            // Data Sync Effect
             useEffect(() => {
-                if (!user) return;
-                
+                if (!user || !window.fb) return;
+                const { db, collection, onSnapshot, appId, isPreview } = window.fb;
                 const path = isPreview 
-                    ? db.collection('artifacts').doc(activeAppId).collection('public').doc('data').collection('drives')
-                    : db.collection('artifacts').doc(activeAppId).collection('users').doc(user.uid).collection('drives');
+                    ? collection(db, 'artifacts', appId, 'public', 'data', 'drives')
+                    : collection(db, 'artifacts', appId, 'users', user.uid, 'drives');
 
-                const unsubscribe = path.onSnapshot((snapshot) => {
-                    const data = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                    setDrives(data.sort((a, b) => b.timestamp - a.timestamp));
-                    setError(""); 
-                }, (err) => {
-                    setError(`Sync Denied: Check Firestore rules.`);
-                });
-                return () => unsubscribe();
+                const unsub = onSnapshot(path, (snap) => {
+                    setDrives(snap.docs.map(d => ({ id: d.id, ...d.data() })).sort((a,b) => b.timestamp - a.timestamp));
+                }, (err) => setError(`Database Denied: Update your Firestore Rules to Public.`));
+                return () => unsub();
             }, [user]);
 
-            const stats = useMemo(() => {
-                const totalMins = drives.reduce((acc, curr) => acc + Number(curr.duration || 0), 0);
-                const totalMiles = drives.reduce((acc, curr) => acc + Number(curr.miles || 0), 0);
-                const nightMins = drives.filter(d => d.timeOfDay === 'Night').reduce((acc, curr) => acc + Number(curr.duration || 0), 0);
-                return { totalMins, totalMiles, nightMins };
-            }, [drives]);
+            const stats = useMemo(() => ({
+                totalMins: drives.reduce((acc, curr) => acc + Number(curr.duration || 0), 0),
+                totalMiles: drives.reduce((acc, curr) => acc + Number(curr.miles || 0), 0),
+                nightMins: drives.filter(d => d.timeOfDay === 'Night').reduce((acc, curr) => acc + Number(curr.duration || 0), 0)
+            }), [drives]);
 
             const handleAdd = async (e) => {
                 e.preventDefault();
                 if (!duration || !miles || isSaving || !user) return;
                 setIsSaving(true);
                 try {
+                    const { db, collection, addDoc, appId, isPreview } = window.fb;
                     const path = isPreview 
-                        ? db.collection('artifacts').doc(activeAppId).collection('public').doc('data').collection('drives')
-                        : db.collection('artifacts').doc(activeAppId).collection('users').doc(user.uid).collection('drives');
-
-                    await path.add({
-                        date, timeOfDay, duration: Number(duration), miles: Number(miles), notes, timestamp: Date.now()
-                    });
+                        ? collection(db, 'artifacts', appId, 'public', 'data', 'drives')
+                        : collection(db, 'artifacts', appId, 'users', user.uid, 'drives');
+                    await addDoc(path, { date, timeOfDay, duration: Number(duration), miles: Number(miles), notes, timestamp: Date.now() });
                     setDuration(''); setMiles(''); setNotes('');
                     setActiveTab('history');
-                } catch (err) {
-                    setError(`Save Error: ${err.message}`);
-                } finally { setIsSaving(false); }
+                } catch (err) { setError(`Save failed.`); } 
+                finally { setIsSaving(false); }
             };
 
-            const handleDelete = async (id) => {
-                if (!confirm("Permanently delete this log?")) return;
-                const path = isPreview 
-                    ? db.collection('artifacts').doc(activeAppId).collection('public').doc('data').collection('drives')
-                    : db.collection('artifacts').doc(activeAppId).collection('users').doc(user.uid).collection('drives');
-                await path.doc(id).delete();
+            const handleManualOverride = async () => {
+                if (!manualKey) return;
+                const newConfig = {
+                    apiKey: manualKey.trim(),
+                    authDomain: "brayden-s-permit-tracker.firebaseapp.com",
+                    projectId: "brayden-s-permit-tracker",
+                    storageBucket: "brayden-s-permit-tracker.firebasestorage.app",
+                    messagingSenderId: "586260387117",
+                    appId: "1:586260387117:web:8bebcc558fca66cf5c6fa4"
+                };
+                await window.manualInit(newConfig);
+                performAuth();
+                setShowEmergency(false);
             };
 
             return (
-                <div className="flex justify-center min-h-screen bg-slate-100 font-sans">
-                    <div className="w-full max-w-md bg-white shadow-2xl min-h-screen flex flex-col relative border-x border-slate-200 overflow-hidden">
-                        
+                <div className="flex justify-center min-h-screen bg-slate-100">
+                    <div className="w-full max-w-md bg-white shadow-2xl min-h-screen flex flex-col relative border-x border-slate-200">
                         <header className="bg-michigan-blue text-michigan-maize p-6 rounded-b-[2.5rem] shadow-xl z-10">
                             <div className="flex items-center gap-4">
                                 <div className="bg-white/10 p-2.5 rounded-2xl border border-white/15 shadow-inner"><Car /></div>
@@ -184,97 +183,87 @@
                         </header>
 
                         <main className="flex-1 p-6 pb-40 overflow-y-auto">
-                            {error && (
-                                <div className="bg-red-50 text-red-600 p-6 rounded-[2.5rem] border-2 border-red-100 text-[11px] font-bold mb-6 animate-fade-in leading-relaxed shadow-sm">
-                                    <p className="mb-4 text-center">⚠️ {error}</p>
-                                    <div className="border-t border-red-100 pt-4 flex flex-col items-center gap-3">
-                                        <button 
-                                            onClick={forceReset}
-                                            className="bg-red-600 text-white px-5 py-2.5 rounded-full uppercase text-[9px] font-black tracking-widest active:scale-95 shadow-md"
-                                        >
-                                            Reset Site Cache
-                                        </button>
-                                        <p className="text-[8px] opacity-40 text-center uppercase font-black tracking-tighter key-text">Active Key: {finalConfig.apiKey}</p>
+                            {error && !showEmergency && (
+                                <div className="bg-red-50 text-red-600 p-6 rounded-3xl border-2 border-red-100 text-[11px] font-bold mb-6 animate-fade-in text-center leading-relaxed">
+                                    <p className="mb-4">⚠️ {error}</p>
+                                    <button 
+                                        onClick={() => setShowEmergency(true)}
+                                        className="bg-red-600 text-white px-4 py-2 rounded-full uppercase text-[9px] font-black tracking-widest shadow-lg active:scale-95"
+                                    >
+                                        Emergency: Manually Enter Key
+                                    </button>
+                                </div>
+                            )}
+
+                            {showEmergency && (
+                                <div className="bg-slate-900 text-white p-8 rounded-[2.5rem] space-y-6 animate-fade-in shadow-2xl">
+                                    <h2 className="text-sm font-black uppercase tracking-widest text-center">Emergency Link</h2>
+                                    <p className="text-[10px] opacity-60 text-center leading-relaxed">If the file is "locked," paste the API key from your Firebase dashboard here.</p>
+                                    <input 
+                                        type="text" 
+                                        placeholder="Paste API Key here..."
+                                        className="w-full p-4 bg-white/10 border border-white/20 rounded-2xl text-xs font-mono outline-none focus:border-michigan-maize"
+                                        value={manualKey}
+                                        onChange={(e) => setManualKey(e.target.value)}
+                                    />
+                                    <div className="flex gap-2">
+                                        <button onClick={() => setShowEmergency(false)} className="flex-1 p-4 bg-white/5 rounded-2xl text-[9px] uppercase font-black tracking-widest">Cancel</button>
+                                        <button onClick={handleManualOverride} className="flex-1 p-4 bg-michigan-maize text-michigan-blue rounded-2xl text-[9px] uppercase font-black tracking-widest">Apply Key</button>
                                     </div>
                                 </div>
                             )}
 
-                            {!user && !error ? (
+                            {!user && !error && !showEmergency ? (
                                 <div className="flex flex-col items-center justify-center py-24 opacity-30">
                                     <div className="w-10 h-10 border-4 border-michigan-blue border-t-transparent rounded-full animate-spin mb-4"></div>
-                                    <p className="text-[10px] font-black uppercase tracking-widest text-center px-10 leading-relaxed">Securing connection to Michigan servers...</p>
+                                    <p className="text-[10px] font-black uppercase tracking-widest text-center">Contacting Servers...</p>
                                 </div>
-                            ) : (
+                            ) : !showEmergency && (
                                 <div className="animate-fade-in">
                                     {activeTab === 'stats' && (
                                         <div className="space-y-7">
                                             <div className="grid grid-cols-2 gap-4">
-                                                <div className="bg-blue-50 p-5 rounded-[2.2rem] border border-blue-100 shadow-sm text-center">
-                                                    <p className="text-[10px] text-blue-400 font-black uppercase mb-1">Total Time</p>
-                                                    <p className="text-2xl font-black text-michigan-blue leading-none tracking-tight">{Math.floor(stats.totalMins/60)}<span className="text-[10px] opacity-40 ml-0.5 font-bold uppercase leading-none">H</span> {stats.totalMins%60}<span className="text-[10px] opacity-40 ml-0.5 font-bold uppercase leading-none">M</span></p>
+                                                <div className="bg-blue-50 p-5 rounded-[2.2rem] border border-blue-100 text-center">
+                                                    <p className="text-[10px] text-blue-400 font-black uppercase mb-1">Time</p>
+                                                    <p className="text-2xl font-black text-michigan-blue">{Math.floor(stats.totalMins/60)}<span className="text-[10px] opacity-40 ml-0.5">H</span> {stats.totalMins%60}<span className="text-[10px] opacity-40 ml-0.5">M</span></p>
                                                 </div>
-                                                <div className="bg-amber-50 p-5 rounded-[2.2rem] border border-amber-100 shadow-sm text-center">
-                                                    <p className="text-[10px] text-amber-500 font-black uppercase mb-1">Distance</p>
-                                                    <p className="text-2xl font-black text-amber-900 leading-none tracking-tight">{stats.totalMiles.toFixed(1)}<span className="text-[10px] opacity-40 ml-1 font-bold tracking-none uppercase leading-none">MI</span></p>
+                                                <div className="bg-amber-50 p-5 rounded-[2.2rem] border border-amber-100 text-center">
+                                                    <p className="text-[10px] text-amber-500 font-black uppercase mb-1">Miles</p>
+                                                    <p className="text-2xl font-black text-amber-900">{stats.totalMiles.toFixed(1)}<span className="text-[10px] opacity-40 ml-1">MI</span></p>
                                                 </div>
                                             </div>
 
-                                            <div className="space-y-8 bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-2xl shadow-slate-200/50">
-                                                <h3 className="text-xs font-black text-slate-800 uppercase tracking-widest border-b border-slate-50 pb-4 text-center">State Requirements</h3>
+                                            <div className="space-y-8 bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-xl">
+                                                <h3 className="text-xs font-black text-slate-800 uppercase tracking-widest text-center border-b border-slate-50 pb-4">State Requirements</h3>
                                                 <div className="space-y-4">
-                                                    <div className="flex justify-between text-[11px] font-black text-slate-500 uppercase px-1">
-                                                        <span>Total Hours (Goal: 50)</span>
-                                                        <span className="text-michigan-blue font-black">{Math.floor(stats.totalMins/60)} / 50</span>
-                                                    </div>
-                                                    <div className="w-full bg-slate-100 h-5 rounded-full overflow-hidden p-1 shadow-inner">
-                                                        <div className="bg-michigan-blue h-full rounded-full transition-all duration-1000 shadow-lg" style={{width: `${Math.min((stats.totalMins/(50*60))*100, 100)}%`}}></div>
-                                                    </div>
+                                                    <div className="flex justify-between text-[11px] font-black text-slate-500 uppercase"><span>Total (50h)</span><span>{Math.floor(stats.totalMins/60)} / 50</span></div>
+                                                    <div className="w-full bg-slate-100 h-5 rounded-full p-1"><div className="bg-michigan-blue h-full rounded-full transition-all duration-1000 shadow-lg" style={{width: `${Math.min((stats.totalMins/(50*60))*100, 100)}%`}}></div></div>
                                                 </div>
                                                 <div className="space-y-4">
-                                                    <div className="flex justify-between text-[11px] font-black text-slate-500 uppercase px-1">
-                                                        <span>Night Hours (Goal: 10)</span>
-                                                        <span className="text-michigan-blue font-black">{Math.floor(stats.nightMins/60)} / 10</span>
-                                                    </div>
-                                                    <div className="w-full bg-slate-100 h-5 rounded-full overflow-hidden p-1 shadow-inner text-center">
-                                                        <div className="bg-michigan-maize h-full rounded-full transition-all duration-1000 shadow-lg" style={{width: `${Math.min((stats.nightMins/(10*60))*100, 100)}%`}}></div>
-                                                    </div>
+                                                    <div className="flex justify-between text-[11px] font-black text-slate-500 uppercase"><span>Night (10h)</span><span>{Math.floor(stats.nightMins/60)} / 10</span></div>
+                                                    <div className="w-full bg-slate-100 h-5 rounded-full p-1"><div className="bg-michigan-maize h-full rounded-full transition-all duration-1000 shadow-lg" style={{width: `${Math.min((stats.nightMins/(10*60))*100, 100)}%`}}></div></div>
                                                 </div>
                                             </div>
                                         </div>
                                     )}
 
                                     {activeTab === 'add' && (
-                                        <form onSubmit={handleAdd} className="space-y-6 pt-2">
-                                            <h2 className="text-xl font-black text-michigan-blue uppercase tracking-tight text-center leading-none">Log New Drive</h2>
+                                        <form onSubmit={handleAdd} className="space-y-5 pt-2">
+                                            <h2 className="text-xl font-black text-michigan-blue uppercase tracking-tight text-center">Log New Session</h2>
                                             <div className="grid grid-cols-2 gap-4">
-                                                <div className="space-y-1.5">
-                                                    <label className="text-[10px] font-black text-slate-400 uppercase ml-2">Date</label>
-                                                    <input type="date" value={date} onChange={e => setDate(e.target.value)} className="w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-2xl font-black text-slate-700 outline-none focus:border-michigan-blue transition-all" />
-                                                </div>
-                                                <div className="space-y-1.5">
-                                                    <label className="text-[10px] font-black text-slate-400 uppercase ml-2">Setting</label>
-                                                    <div className="flex bg-slate-50 p-1 rounded-2xl border-2 border-slate-100">
-                                                        <button type="button" onClick={() => setTimeOfDay('Day')} className={`flex-1 py-3 text-[10px] font-black uppercase rounded-xl transition-all ${timeOfDay === 'Day' ? 'bg-white text-michigan-blue shadow-md' : 'text-slate-400'}`}>Day</button>
-                                                        <button type="button" onClick={() => setTimeOfDay('Night')} className={`flex-1 py-3 text-[10px] font-black uppercase rounded-xl transition-all ${timeOfDay === 'Night' ? 'bg-michigan-blue text-michigan-maize shadow-md' : 'text-slate-400'}`}>Night</button>
-                                                    </div>
+                                                <input type="date" value={date} onChange={e => setDate(e.target.value)} className="p-4 bg-slate-50 border-2 border-slate-100 rounded-2xl font-black text-slate-700" />
+                                                <div className="flex bg-slate-50 p-1 rounded-2xl border-2 border-slate-100">
+                                                    <button type="button" onClick={() => setTimeOfDay('Day')} className={`flex-1 py-3 text-[10px] font-black uppercase rounded-xl transition-all ${timeOfDay === 'Day' ? 'bg-white text-michigan-blue shadow-md' : 'text-slate-400'}`}>Day</button>
+                                                    <button type="button" onClick={() => setTimeOfDay('Night')} className={`flex-1 py-3 text-[10px] font-black uppercase rounded-xl transition-all ${timeOfDay === 'Night' ? 'bg-michigan-blue text-michigan-maize shadow-md' : 'text-slate-400'}`}>Night</button>
                                                 </div>
                                             </div>
                                             <div className="grid grid-cols-2 gap-4">
-                                                <div className="space-y-1.5">
-                                                    <label className="text-[10px] font-black text-slate-400 uppercase ml-2">Duration (Min)</label>
-                                                    <input type="number" placeholder="Min" value={duration} onChange={e => setDuration(e.target.value)} className="w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-2xl font-black text-slate-700 outline-none focus:border-michigan-blue shadow-sm" required />
-                                                </div>
-                                                <div className="space-y-1.5">
-                                                    <label className="text-[10px] font-black text-slate-400 uppercase ml-2">Distance (Mi)</label>
-                                                    <input type="number" step="0.1" placeholder="Mi" value={miles} onChange={e => setMiles(e.target.value)} className="w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-2xl font-black text-slate-700 outline-none focus:border-michigan-blue shadow-sm" required />
-                                                </div>
+                                                <input type="number" placeholder="Min" value={duration} onChange={e => setDuration(e.target.value)} className="p-4 bg-slate-50 border-2 border-slate-100 rounded-2xl font-black" required />
+                                                <input type="number" step="0.1" placeholder="Mi" value={miles} onChange={e => setMiles(e.target.value)} className="p-4 bg-slate-50 border-2 border-slate-100 rounded-2xl font-black" required />
                                             </div>
-                                            <div className="space-y-1.5">
-                                                <label className="text-[10px] font-black text-slate-400 uppercase ml-2">Notes</label>
-                                                <textarea placeholder=" highway merging, parallel parking, etc..." value={notes} onChange={e => setNotes(e.target.value)} className="w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-2xl h-24 resize-none font-medium text-slate-600 outline-none focus:border-michigan-blue shadow-inner"></textarea>
-                                            </div>
-                                            <button type="submit" disabled={isSaving || !user} className="w-full bg-michigan-blue text-michigan-maize font-black py-6 rounded-[2.5rem] shadow-2xl active:scale-95 transition-all text-sm uppercase tracking-widest mt-4 shadow-blue-900/40">
-                                                {isSaving ? "Saving Log..." : "Add to Log"}
+                                            <textarea placeholder=" practiced highways, tricky parking, etc..." value={notes} onChange={e => setNotes(e.target.value)} className="w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-2xl h-24 font-medium text-slate-600 outline-none focus:border-michigan-blue"></textarea>
+                                            <button type="submit" disabled={isSaving} className="w-full bg-michigan-blue text-michigan-maize font-black py-6 rounded-[2.5rem] shadow-2xl active:scale-95 transition-all text-sm uppercase tracking-widest mt-4">
+                                                {isSaving ? "Saving..." : "Add to Log"}
                                             </button>
                                         </form>
                                     )}
@@ -284,22 +273,16 @@
                                             <h2 className="text-[11px] font-black text-slate-400 uppercase tracking-widest text-center">Drive History</h2>
                                             {drives.length === 0 ? (
                                                 <div className="text-center py-24 bg-slate-50 rounded-[3rem] border-2 border-dashed border-slate-200 px-10 opacity-50">
-                                                    <p className="text-slate-400 font-black text-[10px] uppercase tracking-widest leading-relaxed text-center">No sessions logged yet. Log your first drive to start tracking!</p>
+                                                    <p className="text-slate-400 font-black text-[10px] uppercase tracking-widest">No entries yet</p>
                                                 </div>
                                             ) : (
                                                 drives.map(drive => (
-                                                    <div key={drive.id} className="p-7 bg-white border border-slate-100 rounded-[2.2rem] shadow-sm relative active:bg-slate-50 transition-colors">
-                                                        <button onClick={() => handleDelete(drive.id)} className="absolute top-7 right-7 text-slate-300 font-black text-xl hover:text-red-400 transition-colors">×</button>
+                                                    <div key={drive.id} className="p-7 bg-white border border-slate-100 rounded-[2.2rem] shadow-sm relative active:bg-slate-50">
+                                                        <button onClick={async () => { if(confirm("Delete?")) await window.fb.deleteDoc(window.fb.doc(window.fb.db, window.fb.isPreview ? `artifacts/${window.fb.appId}/public/data/drives` : `artifacts/${window.fb.appId}/users/${user.uid}/drives`, drive.id)); }} className="absolute top-7 right-7 text-slate-300 font-black text-xl hover:text-red-400">×</button>
                                                         <p className="text-[10px] font-black text-slate-400 mb-2.5 uppercase leading-none tracking-tighter">{new Date(drive.date + 'T12:00:00').toLocaleDateString('en-US', {month: 'short', day: 'numeric', year: 'numeric'})} • {drive.timeOfDay}</p>
                                                         <div className="flex gap-10">
-                                                            <div className="flex flex-col text-center">
-                                                                <span className="text-[9px] font-black text-slate-300 uppercase mb-1">Time</span>
-                                                                <span className="text-2xl font-black text-michigan-blue leading-none tracking-tight">{drive.duration}<span className="text-[11px] opacity-40 ml-0.5 font-bold uppercase leading-none">M</span></span>
-                                                            </div>
-                                                            <div className="flex flex-col text-center border-l border-slate-50 pl-10">
-                                                                <span className="text-[9px] font-black text-slate-300 uppercase mb-1">Dist</span>
-                                                                <span className="text-2xl font-black text-slate-800 leading-none tracking-tight">{drive.miles}<span className="text-[11px] opacity-40 ml-0.5 font-bold uppercase leading-none">MI</span></span>
-                                                            </div>
+                                                            <div className="flex flex-col text-center"><span className="text-[9px] font-black text-slate-300 uppercase mb-1">Time</span><span className="text-2xl font-black text-michigan-blue">{drive.duration}<span className="text-[11px] opacity-40 ml-0.5 uppercase leading-none font-bold">M</span></span></div>
+                                                            <div className="flex flex-col text-center border-l border-slate-50 pl-10"><span className="text-[9px] font-black text-slate-300 uppercase mb-1">Dist</span><span className="text-2xl font-black text-slate-800">{drive.miles}<span className="text-[11px] opacity-40 ml-0.5 uppercase leading-none font-bold">MI</span></span></div>
                                                         </div>
                                                         {drive.notes && <p className="text-[11px] text-slate-500 font-medium mt-5 border-t border-slate-50 pt-4 italic leading-relaxed text-center">"{drive.notes}"</p>}
                                                     </div>
@@ -311,15 +294,15 @@
                             )}
                         </main>
 
-                        <footer className="fixed bottom-8 left-0 right-0 flex justify-center z-50 pointer-events-none px-6">
-                           <div className="w-full max-w-sm bg-michigan-blue/95 backdrop-blur-2xl border border-white/10 rounded-[3rem] p-5 flex justify-between items-center shadow-[0_30px_70px_-15px_rgba(0,0,0,0.5)] pointer-events-auto border-t border-white/5">
-                                <button onClick={() => setActiveTab('stats')} className={`flex-1 flex flex-col items-center gap-1.5 transition-all ${activeTab === 'stats' ? 'text-michigan-maize scale-110' : 'text-white/30 hover:text-white/60'}`}>
+                        <footer className="fixed bottom-6 left-0 right-0 flex justify-center z-50 pointer-events-none px-6">
+                           <div className="w-full max-w-sm bg-michigan-blue/95 backdrop-blur-2xl border border-white/10 rounded-[3rem] p-5 flex justify-between items-center shadow-[0_30px_70px_-15px_rgba(0,0,0,0.5)] pointer-events-auto">
+                                <button onClick={() => setActiveTab('stats')} className={`flex-1 flex flex-col items-center gap-1.5 transition-all ${activeTab === 'stats' ? 'text-michigan-maize scale-110' : 'text-white/30'}`}>
                                     <span className="text-[9px] font-black uppercase tracking-widest text-center leading-none">Stats</span>
                                 </button>
                                 <button onClick={() => setActiveTab('add')} className={`w-16 h-16 rounded-[1.8rem] flex items-center justify-center transition-all active:scale-90 ${activeTab === 'add' ? 'bg-michigan-maize text-michigan-blue rotate-45 scale-110 shadow-[0_0_25px_rgba(255,203,5,0.4)]' : 'bg-white/10 text-white'}`}>
                                     <Plus />
                                 </button>
-                                <button onClick={() => setActiveTab('history')} className={`flex-1 flex flex-col items-center gap-1.5 transition-all ${activeTab === 'history' ? 'text-michigan-maize scale-110' : 'text-white/30 hover:text-white/60'}`}>
+                                <button onClick={() => setActiveTab('history')} className={`flex-1 flex flex-col items-center gap-1.5 transition-all ${activeTab === 'history' ? 'text-michigan-maize scale-110' : 'text-white/30'}`}>
                                     <span className="text-[9px] font-black uppercase tracking-widest text-center leading-none">Logs</span>
                                 </button>
                            </div>
