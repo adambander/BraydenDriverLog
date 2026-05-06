@@ -7,10 +7,10 @@
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     
-    <!-- Firebase Standard Compat Scripts (Most Stable) -->
-    <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+    <!-- Firebase Standard Compat Scripts (v11.0.2 for highest security compatibility) -->
+    <script src="https://www.gstatic.com/firebasejs/11.0.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/11.0.2/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore-compat.js"></script>
 
     <!-- React and Babel -->
     <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
@@ -39,36 +39,38 @@
     <div id="root">
         <div class="flex flex-col items-center justify-center min-h-screen opacity-30">
             <div class="w-10 h-10 border-4 border-slate-900 border-t-transparent rounded-full animate-spin mb-4"></div>
-            <p class="text-xs font-black uppercase tracking-widest text-center px-10 leading-relaxed">Starting Brayden's Tracker...</p>
+            <p class="text-xs font-black uppercase tracking-widest text-center px-10 leading-relaxed">Connecting to Michigan Servers...</p>
         </div>
     </div>
 
     <script type="text/babel">
         const { useState, useEffect, useMemo } = React;
 
-        // --- FIREBASE CONFIGURATION ---
+        // Clean string helper
+        const scrub = (str) => str ? str.trim().replace(/[\u200B-\u200D\uFEFF]/g, '') : '';
+
+        // CONFIGURATION
         const braydenConfig = {
-            apiKey: "AIzaSyDAcT3sFRZv3gUFcgE0E9aJ8nvXL6jGUGw",
-            authDomain: "brayden-s-permit-tracker.firebaseapp.com",
-            projectId: "brayden-s-permit-tracker",
-            storageBucket: "brayden-s-permit-tracker.firebasestorage.app",
-            messagingSenderId: "586260387117",
-            appId: "1:586260387117:web:8bebcc558fca66cf5c6fa4"
+            apiKey: scrub("AIzaSyDAcT3sFRZv3gUFcgE0E9aJ8nvXL6jGUGw"),
+            authDomain: scrub("brayden-s-permit-tracker.firebaseapp.com"),
+            projectId: scrub("brayden-s-permit-tracker"),
+            storageBucket: scrub("brayden-s-permit-tracker.firebasestorage.app"),
+            messagingSenderId: scrub("586260387117"),
+            appId: scrub("1:586260387117:web:8bebcc558fca66cf5c6fa4")
         };
 
-        // 1. Determine if we are in Gemini Preview or on a Live Site
         const isGemini = typeof window.__firebase_config !== 'undefined' && window.__firebase_config !== null;
         const finalConfig = isGemini ? JSON.parse(window.__firebase_config) : braydenConfig;
         const activeAppId = isGemini && window.__app_id ? window.__app_id : "brayden-s-permit-tracker";
 
-        // 2. Initialize Firebase (Compat)
+        // Initialize
         if (!firebase.apps.length) {
             firebase.initializeApp(finalConfig);
         }
         const auth = firebase.auth();
         const db = firebase.firestore();
 
-        // --- ICONS ---
+        // Icons
         const Car = () => <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path d="M9 17a2 2 0 11-4 0 2 2 0 014 0zM19 17a2 2 0 11-4 0 2 2 0 014 0z"/><path d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 01-1 1H9m4-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V16a1 1 0 01-1 1h-1m-6-1a1 1 0 001 1h1M5 17a2 2 0 104 0m-4 0a2 2 0 114 0m6 0a2 2 0 104 0m-4 0a2 2 0 114 0"/></svg>;
         const Plus = () => <svg className="w-8 h-8" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><path d="M12 4v16m8-8H4"/></svg>;
 
@@ -85,41 +87,37 @@
             const [miles, setMiles] = useState('');
             const [notes, setNotes] = useState('');
 
-            // --- AUTH LOGIC ---
             useEffect(() => {
                 const initAuth = async () => {
-                    try {
-                        let result;
-                        if (isGemini && window.__initial_auth_token) {
-                            result = await auth.signInWithCustomToken(window.__initial_auth_token);
-                        } else {
-                            result = await auth.signInAnonymously();
+                    // Small delay to ensure Google's backend has "settled" for this session
+                    setTimeout(async () => {
+                        try {
+                            let result;
+                            if (isGemini && window.__initial_auth_token) {
+                                result = await auth.signInWithCustomToken(window.__initial_auth_token);
+                            } else {
+                                result = await auth.signInAnonymously();
+                            }
+                            setUser(result.user);
+                            setError("");
+                        } catch (e) {
+                            console.error("Auth Error:", e);
+                            setError(`Google Security Lock: ${e.message}. (Status: Project mismatch or Key Propagation Lag)`);
                         }
-                        setUser(result.user);
-                        setError("");
-                    } catch (e) {
-                        console.error("Auth Error:", e);
-                        setError(`Access Blocked: ${e.message}`);
-                    }
+                    }, 500);
                 };
                 initAuth();
             }, []);
 
-            // --- DATA SYNC ---
             useEffect(() => {
                 if (!user) return;
-                
-                const collectionPath = isGemini 
+                const path = isGemini 
                     ? db.collection('artifacts').doc(activeAppId).collection('public').doc('data').collection('drives')
                     : db.collection('artifacts').doc(activeAppId).collection('users').doc(user.uid).collection('drives');
 
-                const unsub = collectionPath.onSnapshot((snap) => {
-                    const data = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                    setDrives(data.sort((a, b) => b.timestamp - a.timestamp));
-                    setError(""); 
-                }, (err) => {
-                    setError("Database connection error. Ensure Firestore rules are set to public.");
-                });
+                const unsub = path.onSnapshot((snap) => {
+                    setDrives(snap.docs.map(doc => ({ id: doc.id, ...doc.data() })).sort((a, b) => b.timestamp - a.timestamp));
+                }, (err) => setError("Database Access Denied. Check Firestore Rules."));
                 return () => unsub();
             }, [user]);
 
@@ -134,26 +132,22 @@
                 if (!duration || !miles || isSaving || !user) return;
                 setIsSaving(true);
                 try {
-                    const collectionPath = isGemini 
+                    const path = isGemini 
                         ? db.collection('artifacts').doc(activeAppId).collection('public').doc('data').collection('drives')
                         : db.collection('artifacts').doc(activeAppId).collection('users').doc(user.uid).collection('drives');
-
-                    await collectionPath.add({
-                        date, timeOfDay, duration: Number(duration), miles: Number(miles), notes, timestamp: Date.now()
-                    });
+                    await path.add({ date, timeOfDay, duration: Number(duration), miles: Number(miles), notes, timestamp: Date.now() });
                     setDuration(''); setMiles(''); setNotes('');
                     setActiveTab('history');
-                } catch (err) {
-                    setError(`Save failed: ${err.message}`);
-                } finally { setIsSaving(false); }
+                } catch (err) { setError(`Save failed.`); }
+                finally { setIsSaving(false); }
             };
 
             const handleDelete = async (id) => {
-                if (!confirm("Permanently delete this drive log?")) return;
-                const collectionPath = isGemini 
+                if (!confirm("Permanently delete entry?")) return;
+                const path = isGemini 
                     ? db.collection('artifacts').doc(activeAppId).collection('public').doc('data').collection('drives')
                     : db.collection('artifacts').doc(activeAppId).collection('users').doc(user.uid).collection('drives');
-                await collectionPath.doc(id).delete();
+                await path.doc(id).delete();
             };
 
             return (
@@ -172,12 +166,13 @@
                         <main className="flex-1 p-6 pb-40 overflow-y-auto">
                             {error && (
                                 <div className="bg-red-50 text-red-600 p-5 rounded-3xl border-2 border-red-100 text-[11px] font-bold mb-6 animate-fade-in leading-relaxed text-center">
-                                    <p className="mb-2">⚠️ {error}</p>
+                                    <p className="mb-3">⚠️ {error}</p>
                                     <div className="border-t border-red-100 pt-3 opacity-60">
-                                        <p className="text-[8px] uppercase font-black tracking-widest mb-1">System Status:</p>
-                                        <div className="flex justify-around text-[8px] font-mono">
-                                            <span>Env: {isGemini ? "Gemini" : "Live"}</span>
+                                        <p className="text-[8px] uppercase font-black tracking-widest mb-1">System Diagnostic:</p>
+                                        <div className="flex flex-col text-[8px] font-mono text-left bg-white/50 p-2 rounded-xl">
                                             <span>Domain: {window.location.hostname}</span>
+                                            <span>Project: {finalConfig.projectId}</span>
+                                            <span>Check: Ensure 'adambander.github.io' is in authorized domains.</span>
                                         </div>
                                     </div>
                                 </div>
@@ -238,8 +233,8 @@
                                                 </div>
                                             </div>
                                             <div className="grid grid-cols-2 gap-4">
-                                                <input type="number" placeholder="Duration (Min)" value={duration} onChange={e => setDuration(e.target.value)} className="w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-2xl font-black text-slate-700 outline-none focus:border-michigan-blue shadow-sm" required />
-                                                <input type="number" step="0.1" placeholder="Distance (Mi)" value={miles} onChange={e => setMiles(e.target.value)} className="w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-2xl font-black text-slate-700 outline-none focus:border-michigan-blue shadow-sm" required />
+                                                <input type="number" placeholder="Min" value={duration} onChange={e => setDuration(e.target.value)} className="w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-2xl font-black text-slate-700 outline-none focus:border-michigan-blue shadow-sm" required />
+                                                <input type="number" step="0.1" placeholder="Miles" value={miles} onChange={e => setMiles(e.target.value)} className="w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-2xl font-black text-slate-700 outline-none focus:border-michigan-blue shadow-sm" required />
                                             </div>
                                             <textarea placeholder=" highway merges, tricky parking, heavy traffic..." value={notes} onChange={e => setNotes(e.target.value)} className="w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-2xl h-24 resize-none font-medium text-slate-600 outline-none focus:border-michigan-blue shadow-inner"></textarea>
                                             <button type="submit" disabled={isSaving || !user} className="w-full bg-michigan-blue text-michigan-maize font-black py-6 rounded-[2.5rem] shadow-2xl active:scale-95 transition-all text-sm uppercase tracking-widest mt-4 shadow-blue-900/40">
