@@ -142,10 +142,10 @@
             // Data Fetch Effect
             useEffect(() => {
                 if (!user || !window.fb) return;
-                const { db, methods, appId, isGemini } = window.fb;
-                const path = isGemini 
-                    ? methods.collection(db, 'artifacts', appId, 'public', 'data', 'drives')
-                    : methods.collection(db, 'artifacts', appId, 'users', user.uid, 'drives');
+                const { db, methods, appId } = window.fb;
+                
+                // ALWAYS use the public shared folder for everyone
+                const path = methods.collection(db, 'artifacts', appId, 'public', 'data', 'drives');
 
                 const unsub = methods.onSnapshot(path, (snap) => {
                     setDrives(snap.docs.map(d => ({ id: d.id, ...d.data() })).sort((a,b) => b.timestamp - a.timestamp));
@@ -165,10 +165,10 @@
                 if (!duration || !miles || isSaving || !user) return;
                 setIsSaving(true);
                 try {
-                    const { db, methods, appId, isGemini } = window.fb;
-                    const path = isGemini 
-                        ? methods.collection(db, 'artifacts', appId, 'public', 'data', 'drives')
-                        : methods.collection(db, 'artifacts', appId, 'users', user.uid, 'drives');
+                    const { db, methods, appId } = window.fb;
+                    
+                    // ALWAYS save to the public shared folder for everyone
+                    const path = methods.collection(db, 'artifacts', appId, 'public', 'data', 'drives');
                     
                     await methods.addDoc(path, { 
                         date, timeOfDay, duration: Number(duration), miles: Number(miles), weather, traffic, licensedDriver, notes, timestamp: Date.now() 
@@ -183,10 +183,10 @@
 
             const handleDelete = async (id) => {
                 if (!confirm("Permanently delete this drive?")) return;
-                const { db, methods, appId, isGemini } = window.fb;
-                const docPath = isGemini 
-                    ? methods.doc(db, 'artifacts', appId, 'public', 'data', 'drives', id)
-                    : methods.doc(db, 'artifacts', appId, 'users', user.uid, 'drives', id);
+                const { db, methods, appId } = window.fb;
+                
+                // ALWAYS delete from the public shared folder
+                const docPath = methods.doc(db, 'artifacts', appId, 'public', 'data', 'drives', id);
                 await methods.deleteDoc(docPath);
             };
 
@@ -211,7 +211,7 @@
                                 <div className="bg-white/10 p-2.5 rounded-2xl border border-white/15 shadow-inner"><Car className="w-7 h-7" /></div>
                                 <div>
                                     <h1 className="text-2xl font-black uppercase tracking-tighter leading-none mb-1">Permit Tracker</h1>
-                                    <p className="text-[10px] uppercase font-black opacity-70 tracking-[0.2em]">Michigan • Brayden Edition v2.0</p>
+                                    <p className="text-[10px] uppercase font-black opacity-70 tracking-[0.2em]">Michigan • Brayden Edition Family</p>
                                 </div>
                             </div>
                         </header>
